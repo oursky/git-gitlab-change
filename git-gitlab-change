@@ -6,14 +6,17 @@ CHECK_PATH=$1'/'
 
 if [[ "$CI_COMMIT_REF_NAME" =~ ^oursky-ci-pr- ]]; then
     # This is PR
-    echo "Checking changes since ${CI_COMMIT_BEFORE_SHA} against ${CHECK_PATH}"
-    GITDIFF=`git diff --name-only ${CI_COMMIT_BEFORE_SHA} | grep ${CHECK_PATH} | tr -d '[:space:]'`
-    # In case cannot found CI_COMMIT_BEFORE_SHA
-    git cat-file -e ${CI_COMMIT_BEFORE_SHA}
-    has_commit="$?"
-    if [ "$GITDIFF" == "" ] && [ has_commit == "0" ]; then
+    echo "Checking changes since ${CI_COMMIT_SHA} against ${CHECK_PATH}"
+    GITDIFF=`git diff --name-only ${CI_COMMIT_SHA} | grep ${CHECK_PATH} | tr -d '[:space:]'`
+    # Check is this commit commit a merge commit is created automatically
+    PARENT=`git show -s --pretty=%p ${CI_COMMIT_SHA} | wc -w`
+    if [ "$GITDIFF" == "" ] && [ "$PARENT" == "2" ]; then
         echo "No code changes, skipped script"
         exit 0
+    fi
+    # FIXME: to check the commit range against the PR target
+    if [ "$PARENT" == "1" ]; then
+        echo "No merge commit, running the script"
     fi
     "${@:2}"
 else

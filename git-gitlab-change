@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+CHECK_PATH=$1'/'
+
+if [[ "$CI_COMMIT_REF_NAME" =~ ^oursky-ci-pr- ]]; then
+    # This is PR
+    echo "Checking changes since ${CI_COMMIT_BEFORE_SHA} against ${CHECK_PATH}"
+    GITDIFF=`git diff --name-only ${CI_COMMIT_BEFORE_SHA} | grep ${CHECK_PATH} | tr -d '[:space:]'`
+    # In case cannot found CI_COMMIT_BEFORE_SHA
+    git cat-file -e ${CI_COMMIT_BEFORE_SHA}
+    has_commit="$?"
+    if [ "$GITDIFF" == "" ] && [ has_commit == "0" ]; then
+        echo "No code changes, skipped script"
+        exit 0
+    fi
+    "${@:2}"
+else
+  echo "Not a PR, running the script"
+  "${@:2}"
+fi

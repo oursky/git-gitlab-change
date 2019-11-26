@@ -5,6 +5,14 @@ set -e
 CHECK_PATH=$1'/'
 
 if [[ "$CI_COMMIT_REF_NAME" =~ ^oursky-ci-pr- ]]; then
+
+    if [ "`git branch -a | grep origin/master`" == "" ]; then
+        git checkout -b origin/master HEAD~
+        echo `git rev-parse HEAD`
+        git checkout ${CI_COMMIT_SHA}
+        echo `git rev-parse HEAD`
+    fi
+
     # This is PR
     echo "Checking changes since ${CI_COMMIT_SHA} against ${CHECK_PATH}"
     GITDIFF=`git diff --name-only ${CI_COMMIT_SHA} origin/master | grep ${CHECK_PATH} | tr -d '[:space:]'`

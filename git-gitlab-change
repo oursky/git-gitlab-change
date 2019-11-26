@@ -17,7 +17,8 @@ if [[ "$CI_COMMIT_REF_NAME" =~ ^oursky-ci-pr- ]]; then
     echo "Checking changes since ${CI_COMMIT_SHA} against ${CHECK_PATH}"
     GITDIFF=`git diff --name-only ${CI_COMMIT_SHA} origin/master | grep ${CHECK_PATH} | tr -d '[:space:]'`
     # Check is this commit commit a merge commit is created automatically
-    PARENT=`git show -s --pretty=%p ${CI_COMMIT_SHA} | wc -w`
+    PARENT=`git show -s --pretty=%p ${CI_COMMIT_SHA} | wc -w | sed 's/ //g'`
+
     if [ "$GITDIFF" == "" ] && [ "$PARENT" == "2" ]; then
         echo "No code changes, skipped script"
         exit 0

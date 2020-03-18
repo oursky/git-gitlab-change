@@ -20,9 +20,8 @@ script:
 
 # Objective of the script
 
-When we have multiple project in same repo and use travis matrix to build for
-testing, travis will build all matrix regardless there is any change in the
-folder.
+When we have multiple project in same repo and use matrix/stage to build for
+testing, there might be chance building a folder again that have no change.
 
 For example, we have following folder:
 
